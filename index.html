@@ -51,6 +51,7 @@
         }
         .control-group textarea { resize: vertical; height: 70px; }
         .control-group input[type="color"] { width: 40px; height: 35px; border: none; cursor: pointer; border-radius: 4px; padding: 0; background: none; }
+        .control-group input[type="file"] { margin-bottom: 8px; }
         
         .flex-row { display: flex; gap: 10px; align-items: center; }
         .flex-row > div { flex: 1; }
@@ -196,10 +197,9 @@
         
         <div class="tip-box">
             💡 <strong>이미지 조정 팁</strong><br>
-            첨부된 이미지를 <strong>클릭</strong>하면 하단에 조절 바(Slider)가 나타납니다. 모바일에서도 바를 움직여 크기와 위치를 쉽게 맞출 수 있습니다.
+            첨부된 이미지를 <strong>클릭</strong>하면 하단에 조절 바(Slider)가 나타납니다. 4개의 사진 모두 각각 클릭하여 위치와 크기를 독립적으로 조절할 수 있습니다.
         </div>
         
-        <!-- 배경 설정 추가 -->
         <div class="control-group">
             <label>배경 설정</label>
             <div class="flex-row" style="margin-bottom: 10px;">
@@ -254,7 +254,7 @@
         </div>
 
         <div class="control-group">
-            <label>임무 번호 / 날짜 / 위치 / 동행인</label>
+            <label>임무번호 / 날짜 / 위치 / 동행인</label>
             <input type="text" id="missionNoInput" value="CASE-001" placeholder="임무번호" oninput="updateText('missionNo')" style="margin-bottom:5px;">
             <input type="text" id="dateInput" value="2026. 05. 23" placeholder="날짜" oninput="updateText('date')" style="margin-bottom:5px;">
             <input type="text" id="locationInput" value="Sector 7" placeholder="위치" oninput="updateText('location')" style="margin-bottom:5px;">
@@ -272,8 +272,10 @@
         </div>
 
         <div class="control-group">
-            <label>관련 이미지 첨부 (최대 3장)</label>
-            <input type="file" accept="image/*" multiple onchange="loadBottomImages(event)">
+            <label>관련 이미지 첨부 (각각 선택)</label>
+            <input type="file" accept="image/*" onchange="loadBottomImage(event, 1)">
+            <input type="file" accept="image/*" onchange="loadBottomImage(event, 2)">
+            <input type="file" accept="image/*" onchange="loadBottomImage(event, 3)">
         </div>
 
         <!-- 이미지 조정 슬라이더 패널 -->
@@ -327,7 +329,18 @@
                             <div class="details-content" id="disp_details">특이사항 없음. 임무 완수.</div>
                         </div>
 
-                        <div class="bottom-photos" id="disp_bottomPhotos"></div>
+                        <div class="bottom-photos" id="disp_bottomPhotos">
+                            <!-- 관련 이미지 프레임 3개 미리 생성 (이미지 들어오면 보이도록 처리) -->
+                            <div class="photo-frame bottom-photo-frame" id="bottomFrame1" style="transform: rotate(-3deg); display: none;">
+                                <img src="" id="bottomImg1" onclick="setActiveImage(this)">
+                            </div>
+                            <div class="photo-frame bottom-photo-frame" id="bottomFrame2" style="transform: rotate(2deg); display: none;">
+                                <img src="" id="bottomImg2" onclick="setActiveImage(this)">
+                            </div>
+                            <div class="photo-frame bottom-photo-frame" id="bottomFrame3" style="transform: rotate(4deg); display: none;">
+                                <img src="" id="bottomImg3" onclick="setActiveImage(this)">
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -379,7 +392,7 @@
 
         function clearBackgroundImage() {
             document.getElementById('capture-area').style.backgroundImage = 'none';
-            document.getElementById('bgImageInput').value = ''; // 파일 인풋 초기화
+            document.getElementById('bgImageInput').value = ''; 
         }
 
         // --- 이미지 로드 및 조절 기능 ---
@@ -400,32 +413,22 @@
             }
         }
 
-        function loadBottomImages(event) {
-            const files = event.target.files;
-            const container = document.getElementById('disp_bottomPhotos');
-            container.innerHTML = ''; 
-            
-            const maxFiles = Math.min(files.length, 3);
-            const rotations = [-3, 2, 4];
-
-            for (let i = 0; i < maxFiles; i++) {
+        // 관련 이미지 개별 삽입 함수
+        function loadBottomImage(event, index) {
+            const file = event.target.files[0];
+            if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    const frame = document.createElement('div');
-                    frame.className = 'photo-frame bottom-photo-frame';
-                    frame.style.transform = `rotate(${rotations[i % 3]}deg)`;
-
-                    const img = document.createElement('img');
+                    const frame = document.getElementById('bottomFrame' + index);
+                    const img = document.getElementById('bottomImg' + index);
+                    
                     img.src = e.target.result;
-                    img.onclick = function() { setActiveImage(this); };
+                    frame.style.display = 'block'; // 액자 표시
                     
                     resetImageTransform(img);
-                    frame.appendChild(img);
-                    container.appendChild(frame);
-
-                    if (i === 0) setActiveImage(img); // 첫 번째 이미지 자동 활성화
+                    setActiveImage(img); // 방금 추가한 이미지 활성화
                 }
-                reader.readAsDataURL(files[i]);
+                reader.readAsDataURL(file);
             }
         }
 
