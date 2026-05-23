@@ -13,7 +13,6 @@
             --text-color: #1a1a1a;
             --font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
             --bg-color: #1a1a1a;
-            --stamp-color: #d32f2f;
         }
 
         body {
@@ -50,16 +49,16 @@
             width: 100%; padding: 10px; box-sizing: border-box; border-radius: 6px;
             border: 1px solid #555; background: #2c2c2c; color: #fff; font-family: inherit;
         }
-        .control-group textarea { resize: vertical; height: 70px; }
+        .control-group textarea { resize: vertical; height: 120px; }
         .control-group input[type="color"] { width: 40px; height: 35px; border: none; cursor: pointer; border-radius: 4px; padding: 0; background: none; }
         .control-group input[type="file"] { margin-bottom: 8px; }
-        .control-group input[type="checkbox"] { margin-right: 8px; vertical-align: middle; }
         
         .flex-row { display: flex; gap: 10px; align-items: center; }
         .flex-row > div { flex: 1; }
 
         .tip-box { background: #2a3b4c; padding: 15px; border-radius: 6px; margin-bottom: 20px; font-size: 0.85rem; line-height: 1.5; border-left: 4px solid #4CAF50; }
 
+        /* 사진 조절 패널 (바 형태) */
         .image-adjust-panel {
             background: #415942;
             padding: 15px;
@@ -88,7 +87,7 @@
         /* --- 우측 미리보기 영역 --- */
         .preview-container {
             width: 650px; 
-            height: 1050px;
+            height: 1250px;
             flex-shrink: 0;
             background: #1a1a1a;
             position: relative;
@@ -115,7 +114,7 @@
         }
 
         .folder {
-            width: 500px; height: 940px;
+            width: 500px; height: 1150px;
             background-color: var(--folder-color);
             border-radius: 5px 20px 5px 5px;
             position: relative;
@@ -128,12 +127,13 @@
             border-radius: 0 10px 10px 0; box-shadow: inset -5px 0 10px rgba(0,0,0,0.2);
         }
 
+        /* 구겨진/찢어진 배경 종이들 */
         .bg-paper { position: absolute; background: #e0e0e0; box-shadow: 2px 2px 8px rgba(0,0,0,0.3); z-index: 1; }
-        .bg-paper-1 { width: 470px; height: 910px; transform: rotate(-5deg) translate(-10px, 10px); background: linear-gradient(135deg, #f0f0f0, #d0d0d0); border: 1px solid #ccc; }
-        .bg-paper-2 { width: 480px; height: 880px; transform: rotate(1deg) translate(5px, -15px); background-color: #dbdbdb; clip-path: polygon(0% 0%, 100% 0%, 98% 20%, 100% 40%, 97% 60%, 100% 80%, 96% 100%, 0% 100%); }
+        .bg-paper-1 { width: 470px; height: 1120px; transform: rotate(-5deg) translate(-10px, 10px); background: linear-gradient(135deg, #f0f0f0, #d0d0d0); border: 1px solid #ccc; }
+        .bg-paper-2 { width: 480px; height: 1090px; transform: rotate(1deg) translate(5px, -15px); background-color: #dbdbdb; clip-path: polygon(0% 0%, 100% 0%, 98% 20%, 100% 40%, 97% 60%, 100% 80%, 96% 100%, 0% 100%); }
 
         .paper {
-            width: 460px; height: 900px;
+            width: 460px; height: 1100px;
             background-color: var(--paper-color);
             color: var(--text-color);
             box-shadow: 3px 3px 15px rgba(0,0,0,0.3);
@@ -141,18 +141,20 @@
             position: relative; z-index: 2;
             font-family: var(--font-family);
             transform: rotate(-3deg);
+            display: flex;
+            flex-direction: column;
         }
 
         .paper::before { content: '📎'; position: absolute; top: -15px; right: 30px; font-size: 38px; transform: rotate(15deg); z-index: 10; }
 
         .corner-text { font-size: 0.75rem; font-weight: bold; position: absolute; top: 15px; left: 20px; letter-spacing: 1px; border-bottom: 1.5px solid var(--text-color); }
-        .title { text-align: center; font-size: 2.2rem; font-weight: 900; margin-top: 15px; margin-bottom: 25px; border-bottom: 3px solid var(--text-color); padding-bottom: 10px; letter-spacing: 2px; }
+        .title { text-align: center; font-size: 2.2rem; font-weight: 900; margin-top: 15px; margin-bottom: 25px; border-bottom: 3px solid var(--text-color); padding-bottom: 10px; letter-spacing: 2px; flex-shrink: 0; }
         
-        .top-section { display: flex; justify-content: space-between; margin-bottom: 20px; }
+        .top-section { display: flex; justify-content: space-between; margin-bottom: 20px; flex-shrink: 0; }
         .info-table { width: 55%; font-size: 0.95rem; line-height: 2; border-top: 1px solid var(--text-color); border-bottom: 1px solid var(--text-color); padding: 10px 0; }
         .info-row { display: flex; border-bottom: 1px dotted rgba(0,0,0,0.3); }
         .info-row:last-child { border-bottom: none; }
-        .info-label { width: 75px; font-weight: bold; }
+        .info-label { width: 80px; font-weight: bold; } /* 라벨 너비 약간 조정 */
         .info-value { flex: 1; word-break: keep-all; }
 
         .photo-frame { overflow: hidden; position: relative; background: #ccc; resize: both; border: 2px solid var(--text-color); box-shadow: 2px 2px 8px rgba(0,0,0,0.2); }
@@ -160,29 +162,12 @@
         .active-img { outline: 4px solid #4CAF50; outline-offset: -4px; z-index: 10; }
         .main-photo-frame { width: 130px; height: 170px; transform: rotate(2deg); display: none; }
         
-        .details-section { margin-top: 20px; min-height: 200px; padding-bottom: 100px; position: relative; }
+        .details-section { margin-top: 10px; flex-grow: 1; position: relative; }
         .details-section h3 { font-size: 1.15rem; border-bottom: 2px solid var(--text-color); padding-bottom: 5px; margin-bottom: 12px; }
         .details-content { font-size: 0.95rem; line-height: 1.7; white-space: pre-wrap; word-break: break-word; }
 
-        .bottom-photos { margin-top: 20px; display: flex; gap: 15px; justify-content: center; align-items: center; height: 220px; }
+        .bottom-photos { margin-top: auto; padding-top: 20px; display: flex; gap: 15px; justify-content: center; align-items: center; height: 200px; flex-shrink: 0; }
         .bottom-photo-frame { width: 130px; height: 130px; border: 4px solid #fff; }
-
-        /* --- 도장 CSS --- */
-        #disp_stamp_area {
-            position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
-            display: none; 
-            text-align: center;
-        }
-        #disp_stamp_img {
-            max-width: 140px; 
-            height: auto;
-            display: block;
-            margin: 0 auto 5px;
-            /* 흰 배경을 투명하게 만들어 종이와 섞이게 하는 핵심 속성 */
-            mix-blend-mode: multiply; 
-            opacity: 0.85; 
-        }
-        #disp_stamp_text { font-size: 0.8rem; font-weight: bold; color: var(--stamp-color); margin-top: -5px; letter-spacing: 2px;}
     </style>
 </head>
 <body>
@@ -235,21 +220,12 @@
                 <input type="color" id="textColor" value="#1a1a1a" oninput="updateColors()">
             </div>
         </div>
-        
+
         <hr style="border-color:#555; margin:20px 0;">
 
         <div class="control-group">
-            <label style="color:#ff9e9e;">🚨 도장 이미지 원본 첨부</label>
-            <input type="file" accept="image/*" onchange="processStampImage(event)">
-            <div class="flex-row" style="margin-top: 8px;">
-                <input type="checkbox" id="stampEnabled" onchange="updateStamp()">
-                <label for="stampEnabled" style="font-weight:normal; display:inline-block; margin-bottom:0;">보고서 승인 도장 찍기</label>
-            </div>
-        </div>
-
-        <div class="control-group">
             <label>소속</label>
-            <select id="affiliationSelect" onchange="toggleCustomAffiliation(); updateStamp();">
+            <select id="affiliationSelect" onchange="toggleCustomAffiliation();">
                 <option value="HELIOS" selected>HELIOS</option>
                 <option value="ECLIPSE">ECLIPSE</option>
                 <option value="CUSTOM">직접 입력</option>
@@ -258,10 +234,11 @@
         </div>
 
         <div class="control-group">
-            <label>임무번호 / 날짜 / 위치 / 동행인</label>
-            <input type="text" id="missionNoInput" value="CASE-001" placeholder="임무번호" oninput="updateText('missionNo')" style="margin-bottom:5px;">
-            <input type="text" id="dateInput" value="2026. 05. 23" placeholder="날짜" oninput="updateText('date')" style="margin-bottom:5px;">
-            <input type="text" id="locationInput" value="Sector 7" placeholder="위치" oninput="updateText('location')" style="margin-bottom:5px;">
+            <label>문서 등급 / 임무 번호 / 작성 일자 / 임무 기간 / 동행인</label>
+            <input type="text" id="documentGradeInput" value="1급 기밀" placeholder="문서 등급" oninput="updateText('documentGrade')" style="margin-bottom:5px;">
+            <input type="text" id="missionNoInput" value="CASE-001" placeholder="임무 번호" oninput="updateText('missionNo')" style="margin-bottom:5px;">
+            <input type="text" id="creationDateInput" value="2026. 05. 24" placeholder="작성 일자" oninput="updateText('creationDate')" style="margin-bottom:5px;">
+            <input type="text" id="missionPeriodInput" value="2026. 05. 20 ~ 2026. 05. 23" placeholder="임무 기간" oninput="updateText('missionPeriod')" style="margin-bottom:5px;">
             <input type="text" id="companionInput" value="Agent K" placeholder="동행인" oninput="updateText('companion')">
         </div>
 
@@ -315,9 +292,10 @@
 
                         <div class="top-section">
                             <div class="info-table">
-                                <div class="info-row"><div class="info-label">임무번호</div><div class="info-value" id="disp_missionNo">CASE-001</div></div>
-                                <div class="info-row"><div class="info-label">날짜</div><div class="info-value" id="disp_date">2026. 05. 23</div></div>
-                                <div class="info-row"><div class="info-label">위치</div><div class="info-value" id="disp_location">Sector 7</div></div>
+                                <div class="info-row"><div class="info-label">문서 등급</div><div class="info-value" id="disp_documentGrade">1급 기밀</div></div>
+                                <div class="info-row"><div class="info-label">임무 번호</div><div class="info-value" id="disp_missionNo">CASE-001</div></div>
+                                <div class="info-row"><div class="info-label">작성 일자</div><div class="info-value" id="disp_creationDate">2026. 05. 24</div></div>
+                                <div class="info-row"><div class="info-label">임무 기간</div><div class="info-value" id="disp_missionPeriod">2026. 05. 20 ~ 2026. 05. 23</div></div>
                                 <div class="info-row"><div class="info-label">동행인</div><div class="info-value" id="disp_companion">Agent K</div></div>
                             </div>
                             
@@ -329,11 +307,6 @@
                         <div class="details-section">
                             <h3>임무 내용</h3>
                             <div class="details-content" id="disp_details">특이사항 없음. 임무 완수.</div>
-                            
-                            <div id="disp_stamp_area">
-                                <img src="" id="disp_stamp_img" alt="승인 도장">
-                                <div id="disp_stamp_text">- APPROVED -</div>
-                            </div>
                         </div>
 
                         <div class="bottom-photos" id="disp_bottomPhotos">
@@ -354,81 +327,6 @@
     </div>
 
     <script>
-        // 빈 도장 데이터 준비
-        let STAMP_IMAGES = {
-            'ECLIPSE': '', // 상단 Arbiter
-            'HELIOS': '',  // 하단 Panoptes
-            'CUSTOM': ''
-        };
-
-        // --- 올려주신 도장 이미지를 반으로 자르는 기능 ---
-        function processStampImage(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const img = new Image();
-            img.onload = function() {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                
-                const w = img.width;
-                const h = img.height / 2; // 세로로 정확히 절반 자르기
-
-                canvas.width = w;
-                canvas.height = h;
-
-                // 1. 위쪽 절반 (ECLIPSE - ARBITER) 추출
-                ctx.clearRect(0, 0, w, h);
-                ctx.drawImage(img, 0, 0, w, h, 0, 0, w, h);
-                STAMP_IMAGES['ECLIPSE'] = canvas.toDataURL('image/png');
-
-                // 2. 아래쪽 절반 (HELIOS - PANOPTES) 추출
-                ctx.clearRect(0, 0, w, h);
-                ctx.drawImage(img, 0, h, w, h, 0, 0, w, h);
-                STAMP_IMAGES['HELIOS'] = canvas.toDataURL('image/png');
-
-                alert("도장 이미지가 성공적으로 분리되어 등록되었습니다!\n이제 '보고서 승인 도장 찍기'를 체크해보세요.");
-                
-                // 만약 체크되어 있다면 즉시 반영
-                if(document.getElementById('stampEnabled').checked) {
-                    updateStamp();
-                }
-            };
-            img.src = URL.createObjectURL(file);
-        }
-
-        // --- 도장 업데이트 ---
-        function updateStamp() {
-            const isEnabled = document.getElementById('stampEnabled').checked;
-            const select = document.getElementById('affiliationSelect').value;
-            const stampArea = document.getElementById('disp_stamp_area');
-            const stampImg = document.getElementById('disp_stamp_img');
-            
-            if(isEnabled) {
-                if(!STAMP_IMAGES['ECLIPSE'] && !STAMP_IMAGES['HELIOS']) {
-                    alert("먼저 [🚨 도장 이미지 원본 첨부] 버튼을 눌러 올려주셨던 도장 이미지를 등록해주세요!");
-                    document.getElementById('stampEnabled').checked = false;
-                    return;
-                }
-
-                if(STAMP_IMAGES[select]) {
-                    stampImg.src = STAMP_IMAGES[select];
-                    stampArea.style.display = 'block';
-                    
-                    if(select === 'ECLIPSE') {
-                        stampImg.style.maxWidth = '150px'; 
-                    } else if(select === 'HELIOS') {
-                        stampImg.style.maxWidth = '180px'; 
-                    }
-                } else {
-                    stampArea.style.display = 'none';
-                }
-            } else {
-                stampArea.style.display = 'none';
-            }
-        }
-
-
         // --- 텍스트/색상/폰트/배경 등 업데이트 ---
         function updateText(field) {
             if (field === 'affiliation') {
