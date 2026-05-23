@@ -3,17 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>임무 보고서 메이커</title>
+    <title>임무 보고서 작성</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dongle&family=Gowun+Dodum&family=Nanum+Myeongjo&family=Nanum+Pen+Script&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
             --folder-color: #a32a2a;
             --paper-color: #f4f4f4;
             --text-color: #1a1a1a;
+            --font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
         }
 
         body {
-            font-family: 'Pretendard', -apple-system, sans-serif;
+            font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
             background-color: #2c2c2c;
             color: #fff;
             margin: 0;
@@ -23,205 +25,246 @@
             justify-content: center;
         }
 
-        /* 컨트롤 패널 (좌측) */
+        /* 스크롤바 디자인 (웹킷) */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-thumb { background: #666; border-radius: 4px; }
+
+        /* 좌측 컨트롤 패널 */
         .controls {
-            width: 350px;
+            width: 380px;
             background: #3d3d3d;
-            padding: 20px;
-            border-radius: 10px;
+            padding: 25px;
+            border-radius: 12px;
             max-height: 90vh;
             overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
-        .controls h2 { margin-top: 0; font-size: 1.2rem; }
+        .controls h2 { margin-top: 0; font-size: 1.3rem; border-bottom: 2px solid #555; padding-bottom: 10px; }
         .control-group { margin-bottom: 15px; }
-        .control-group label { display: block; margin-bottom: 5px; font-size: 0.9rem; }
+        .control-group label { display: block; margin-bottom: 6px; font-size: 0.9rem; font-weight: bold; color: #ddd; }
         .control-group input[type="text"], 
-        .control-group input[type="date"],
         .control-group select,
         .control-group textarea {
             width: 100%;
-            padding: 8px;
+            padding: 10px;
             box-sizing: border-box;
-            border-radius: 4px;
-            border: 1px solid #666;
+            border-radius: 6px;
+            border: 1px solid #555;
             background: #2c2c2c;
             color: #fff;
+            font-family: inherit;
         }
         .control-group textarea { resize: vertical; height: 80px; }
         
         .color-pickers { display: flex; gap: 10px; margin-bottom: 15px; }
         .color-pickers div { flex: 1; }
-        .color-pickers input[type="color"] { width: 100%; height: 30px; border: none; cursor: pointer; }
+        .color-pickers input[type="color"] { width: 100%; height: 35px; border: none; cursor: pointer; border-radius: 4px; }
+
+        .tip-box {
+            background: #2a3b4c;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            border-left: 4px solid #4CAF50;
+        }
 
         button.save-btn {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             background: #4CAF50;
             color: white;
             border: none;
-            border-radius: 5px;
-            font-size: 1rem;
+            border-radius: 6px;
+            font-size: 1.1rem;
             cursor: pointer;
             font-weight: bold;
-            margin-top: 10px;
+            transition: 0.2s;
         }
-        button.save-btn:hover { background: #45a049; }
+        button.save-btn:hover { background: #45a049; transform: translateY(-2px); }
 
-        /* 미리보기 캔버스 영역 (우측, 560x1000 고정) */
+        /* 우측 미리보기 영역 */
         .preview-container {
             width: 560px;
             height: 1000px;
             flex-shrink: 0;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-            background: #111;
+            background: #1a1a1a;
             position: relative;
+            box-shadow: 0 0 25px rgba(0,0,0,0.8);
+            overflow: hidden;
+            border-radius: 8px;
         }
 
-        /* 실제 캡처될 영역 */
         #capture-area {
             width: 100%;
             height: 100%;
-            background-color: #111; /* 배경 바깥부분 */
+            background-color: #1a1a1a;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
-            overflow: hidden;
         }
 
-        /* 파일철 디자인 */
-        .folder {
-            width: 520px;
-            height: 960px;
-            background-color: var(--folder-color);
-            border-radius: 5px 25px 5px 5px;
+        /* 삐뚤어진 파일철 래퍼 */
+        .folder-wrapper {
             position: relative;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
+            transform: rotate(-1.5deg); /* 파일철 살짝 삐뚤어지게 */
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        /* 파일철 인덱스 탭 느낌 */
+
+        /* 연필 장식 (CSS로 그리기) */
+        .pencil {
+            position: absolute;
+            top: 40px;
+            right: 10px;
+            width: 12px;
+            height: 180px;
+            background: linear-gradient(to right, #e5a910 0%, #f7c331 50%, #d89f0f 100%);
+            box-shadow: 4px 4px 6px rgba(0,0,0,0.4);
+            transform: rotate(12deg);
+            z-index: 20;
+        }
+        .pencil::before {
+            content: '';
+            position: absolute;
+            top: -15px;
+            left: 0;
+            width: 12px;
+            height: 15px;
+            background: linear-gradient(to bottom, #f29b9b 60%, #a3a3a3 60%, #d1d1d1 100%);
+            border-radius: 3px 3px 0 0;
+        }
+        .pencil::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 0;
+            border-top: 20px solid #e8cc9e; /* 나무 깎인 부분 */
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+        }
+        .pencil-lead {
+            position: absolute;
+            bottom: -20px;
+            left: 4.5px;
+            border-top: 5px solid #333; /* 심 */
+            border-left: 1.5px solid transparent;
+            border-right: 1.5px solid transparent;
+            z-index: 21;
+        }
+
+        /* 파일철 본체 */
+        .folder {
+            width: 500px;
+            height: 940px;
+            background-color: var(--folder-color);
+            border-radius: 5px 20px 5px 5px;
+            position: relative;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.4), 10px 10px 20px rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
         .folder::before {
             content: '';
             position: absolute;
-            top: 20px;
-            right: -10px;
+            top: 30px;
+            right: -12px;
             width: 20px;
-            height: 150px;
+            height: 160px;
             background-color: inherit;
             border-radius: 0 10px 10px 0;
-            box-shadow: inset -5px 0 10px rgba(0,0,0,0.1);
+            box-shadow: inset -5px 0 10px rgba(0,0,0,0.2);
         }
 
-        /* 보고서 종이 디자인 */
+        /* 종이 본체 */
         .paper {
-            width: 480px;
-            height: 920px;
+            width: 460px;
+            height: 900px;
             background-color: var(--paper-color);
             color: var(--text-color);
-            box-shadow: 2px 2px 15px rgba(0,0,0,0.4);
-            padding: 30px;
+            box-shadow: 3px 3px 15px rgba(0,0,0,0.3);
+            padding: 35px 30px;
             box-sizing: border-box;
             position: relative;
-            background-image: repeating-linear-gradient(transparent, transparent 29px, rgba(0,0,0,0.05) 30px);
-            background-attachment: local;
+            font-family: var(--font-family); /* 폰트 적용 */
         }
 
         .paper::before {
             content: '📎';
             position: absolute;
-            top: -15px;
-            left: 30px;
-            font-size: 40px;
-            transform: rotate(-15deg);
-        }
-
-        /* 종이 내부 레이아웃 */
-        .corner-text {
-            font-size: 0.7rem;
-            font-weight: bold;
-            position: absolute;
-            top: 15px;
+            top: -12px;
             left: 20px;
-            letter-spacing: 1px;
-            border-bottom: 1px solid var(--text-color);
+            font-size: 38px;
+            transform: rotate(-20deg);
+            z-index: 10;
         }
 
-        .title {
-            text-align: center;
-            font-size: 2rem;
-            font-weight: 900;
-            margin-top: 20px;
-            margin-bottom: 25px;
-            border-bottom: 3px double var(--text-color);
-            padding-bottom: 10px;
-            letter-spacing: 2px;
-        }
-
-        .top-section {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-
+        /* 텍스트 레이아웃 */
+        .corner-text { font-size: 0.75rem; font-weight: bold; position: absolute; top: 15px; left: 20px; letter-spacing: 1px; border-bottom: 1.5px solid var(--text-color); }
+        .title { text-align: center; font-size: 2.2rem; font-weight: 900; margin-top: 15px; margin-bottom: 25px; border-bottom: 3px solid var(--text-color); padding-bottom: 10px; letter-spacing: 2px; }
+        
+        .top-section { display: flex; justify-content: space-between; margin-bottom: 20px; }
+        
         .info-table {
-            width: 60%;
-            font-size: 0.9rem;
-            line-height: 1.8;
-            border-top: 2px solid var(--text-color);
-            border-bottom: 2px solid var(--text-color);
+            width: 55%; font-size: 0.95rem; line-height: 2;
+            border-top: 1px solid var(--text-color); border-bottom: 1px solid var(--text-color);
             padding: 10px 0;
         }
-        
-        .info-row { display: flex; border-bottom: 1px dashed rgba(0,0,0,0.2); }
+        .info-row { display: flex; border-bottom: 1px dotted rgba(0,0,0,0.3); }
         .info-row:last-child { border-bottom: none; }
-        .info-label { width: 80px; font-weight: bold; }
+        .info-label { width: 75px; font-weight: bold; }
         .info-value { flex: 1; word-break: keep-all; }
 
-        .main-photo {
-            width: 120px;
-            height: 160px;
-            border: 2px solid var(--text-color);
+        /* 사진 프레임 공통 (리사이즈 및 넘침 숨김) */
+        .photo-frame {
+            overflow: hidden;
+            position: relative;
             background: #ccc;
+            resize: both; /* 사용자 직접 액자 크기 조절 가능 */
+        }
+        .photo-frame img {
+            width: 100%;
+            height: 100%;
             object-fit: cover;
-            transform: rotate(3deg);
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+            transform-origin: center;
+            cursor: grab;
+            display: block;
+        }
+        .photo-frame img:active { cursor: grabbing; }
+
+        /* 메인 사진 프레임 */
+        .main-photo-frame {
+            width: 130px;
+            height: 170px;
+            border: 2px solid var(--text-color);
+            transform: rotate(2deg);
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+            display: none; /* 이미지 없을 땐 숨김 */
         }
 
-        .details-section {
-            margin-top: 20px;
-            min-height: 250px;
-        }
-        .details-section h3 {
-            font-size: 1.1rem;
-            border-bottom: 2px solid var(--text-color);
-            padding-bottom: 5px;
-            margin-bottom: 10px;
-        }
-        .details-content {
-            font-size: 0.95rem;
-            line-height: 1.6;
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
+        .details-section { margin-top: 20px; min-height: 200px; }
+        .details-section h3 { font-size: 1.15rem; border-bottom: 2px solid var(--text-color); padding-bottom: 5px; margin-bottom: 12px; }
+        .details-content { font-size: 0.95rem; line-height: 1.7; white-space: pre-wrap; word-break: break-word; }
 
+        /* 하단 관련 이미지 영역 */
         .bottom-photos {
             margin-top: 20px;
             display: flex;
-            gap: 10px;
+            gap: 15px;
             justify-content: center;
             align-items: center;
-            height: 200px;
+            height: 220px;
         }
-        
-        .bottom-photos img {
-            object-fit: cover;
+        .bottom-photo-frame {
             border: 5px solid #fff;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-            border-radius: 2px;
-            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            width: 130px; 
+            height: 130px; 
         }
     </style>
 </head>
@@ -230,13 +273,31 @@
     <div class="controls">
         <h2>보고서 설정</h2>
         
+        <div class="tip-box">
+            💡 <strong>사진 조절 팁</strong><br>
+            - 첨부된 <strong>사진 위에서 마우스 휠</strong>을 굴려 비율을 유지한 채 크기를 확대/축소하세요.<br>
+            - <strong>마우스로 드래그</strong>하여 원하는 위치(얼굴 등)가 보이게 맞추세요.<br>
+            - <strong>사진 액자의 우측 하단을 드래그</strong>하면 액자 크기 자체를 조절할 수 있습니다.
+        </div>
+
+        <div class="control-group">
+            <label>글씨체 선택</label>
+            <select id="fontSelect" onchange="updateFont()">
+                <option value="'Pretendard', 'Noto Sans KR', sans-serif">기본 (고딕)</option>
+                <option value="'Nanum Myeongjo', serif">나눔명조 (진지한 서류 느낌)</option>
+                <option value="'Gowun Dodum', sans-serif">고운돋움 (단정한 폰트)</option>
+                <option value="'Nanum Pen Script', cursive">나눔펜글씨 (손글씨 느낌)</option>
+                <option value="'Dongle', sans-serif">동글 (귀여운 폰트)</option>
+            </select>
+        </div>
+
         <div class="color-pickers">
             <div>
                 <label>파일철 색상</label>
                 <input type="color" id="folderColor" value="#a32a2a" oninput="updateColors()">
             </div>
             <div>
-                <label>보고서 색상</label>
+                <label>종이 색상</label>
                 <input type="color" id="paperColor" value="#f4f4f4" oninput="updateColors()">
             </div>
             <div>
@@ -246,7 +307,7 @@
         </div>
 
         <div class="control-group">
-            <label>소속 (상단 구석)</label>
+            <label>소속</label>
             <select id="affiliationSelect" onchange="toggleCustomAffiliation()">
                 <option value="HELIOS">HELIOS</option>
                 <option value="ECLIPSE">ECLIPSE</option>
@@ -259,24 +320,21 @@
             <label>임무번호</label>
             <input type="text" id="missionNoInput" value="CASE-001" oninput="updateText('missionNo')">
         </div>
-
         <div class="control-group">
             <label>날짜</label>
             <input type="text" id="dateInput" value="2026. 05. 23" oninput="updateText('date')">
         </div>
-
         <div class="control-group">
             <label>위치</label>
             <input type="text" id="locationInput" value="Sector 7" oninput="updateText('location')">
         </div>
-
         <div class="control-group">
             <label>동행인</label>
             <input type="text" id="companionInput" value="Agent K" oninput="updateText('companion')">
         </div>
 
         <div class="control-group">
-            <label>메인 사진 (상단 우측)</label>
+            <label>보고서 사진</label>
             <input type="file" accept="image/*" onchange="loadMainImage(event)">
         </div>
 
@@ -286,9 +344,8 @@
         </div>
 
         <div class="control-group">
-            <label>관련 이미지 (하단, 1~3장)</label>
+            <label>첨부 이미지</label>
             <input type="file" accept="image/*" multiple onchange="loadBottomImages(event)">
-            <small style="color:#aaa; display:block; margin-top:5px;">* 선택할 때마다 기존 사진이 덮어씌워집니다.</small>
         </div>
 
         <button class="save-btn" onclick="saveImage()">고화질 저장하기 (560x1000)</button>
@@ -296,80 +353,85 @@
 
     <div class="preview-container">
         <div id="capture-area">
-            <div class="folder">
-                <div class="paper">
-                    <div class="corner-text" id="disp_affiliation">HELIOS</div>
-                    
-                    <div class="title">임무 보고서</div>
+            <div class="folder-wrapper">
+                
+                <div class="pencil">
+                    <div class="pencil-lead"></div>
+                </div>
 
-                    <div class="top-section">
-                        <div class="info-table">
-                            <div class="info-row">
-                                <div class="info-label">임무번호</div>
-                                <div class="info-value" id="disp_missionNo">CASE-001</div>
-                            </div>
-                            <div class="info-row">
-                                <div class="info-label">날짜</div>
-                                <div class="info-value" id="disp_date">2026. 05. 23</div>
-                            </div>
-                            <div class="info-row">
-                                <div class="info-label">위치</div>
-                                <div class="info-value" id="disp_location">Sector 7</div>
-                            </div>
-                            <div class="info-row">
-                                <div class="info-label">동행인</div>
-                                <div class="info-value" id="disp_companion">Agent K</div>
-                            </div>
-                        </div>
+                <div class="folder">
+                    <div class="paper">
+                        <div class="corner-text" id="disp_affiliation">HELIOS</div>
                         
-                        <img src="" id="disp_mainPhoto" class="main-photo" style="display:none;">
-                    </div>
+                        <div class="title">임무 보고서</div>
 
-                    <div class="details-section">
-                        <h3>임무 내용</h3>
-                        <div class="details-content" id="disp_details">특이사항 없음. 임무 완수.</div>
-                    </div>
-
-                    <div class="bottom-photos" id="disp_bottomPhotos">
+                        <div class="top-section">
+                            <div class="info-table">
+                                <div class="info-row">
+                                    <div class="info-label">임무번호</div>
+                                    <div class="info-value" id="disp_missionNo">CASE-001</div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="info-label">날짜</div>
+                                    <div class="info-value" id="disp_date">2026. 05. 23</div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="info-label">위치</div>
+                                    <div class="info-value" id="disp_location">Sector 7</div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="info-label">동행인</div>
+                                    <div class="info-value" id="disp_companion">Agent K</div>
+                                </div>
+                            </div>
+                            
+                            <div class="photo-frame main-photo-frame" id="mainPhotoFrame">
+                                <img src="" id="disp_mainPhoto">
+                            </div>
                         </div>
+
+                        <div class="details-section">
+                            <h3>임무 내용</h3>
+                            <div class="details-content" id="disp_details">특이사항 없음. 임무 완수.</div>
+                        </div>
+
+                        <div class="bottom-photos" id="disp_bottomPhotos"></div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // 텍스트 업데이트
+        // --- 텍스트 및 속성 업데이트 함수들 ---
         function updateText(field) {
             if (field === 'affiliation') {
                 const select = document.getElementById('affiliationSelect').value;
                 const custom = document.getElementById('customAffiliation').value;
                 document.getElementById('disp_affiliation').innerText = select === 'CUSTOM' ? custom : select;
             } else {
-                const val = document.getElementById(field + 'Input').value;
-                document.getElementById('disp_' + field).innerText = val;
+                document.getElementById('disp_' + field).innerText = document.getElementById(field + 'Input').value;
             }
         }
 
-        // 상단 구석 소속 선택 토글
         function toggleCustomAffiliation() {
             const select = document.getElementById('affiliationSelect').value;
             const customInput = document.getElementById('customAffiliation');
-            if (select === 'CUSTOM') {
-                customInput.style.display = 'block';
-            } else {
-                customInput.style.display = 'none';
-            }
+            customInput.style.display = select === 'CUSTOM' ? 'block' : 'none';
             updateText('affiliation');
         }
 
-        // 색상 업데이트 (CSS 변수 활용)
         function updateColors() {
             document.documentElement.style.setProperty('--folder-color', document.getElementById('folderColor').value);
             document.documentElement.style.setProperty('--paper-color', document.getElementById('paperColor').value);
             document.documentElement.style.setProperty('--text-color', document.getElementById('textColor').value);
         }
 
-        // 상단 메인 이미지 로드
+        function updateFont() {
+            document.documentElement.style.setProperty('--font-family', document.getElementById('fontSelect').value);
+        }
+
+        // --- 이미지 로드 함수 ---
         function loadMainImage(event) {
             const file = event.target.files[0];
             if (file) {
@@ -377,54 +439,112 @@
                 reader.onload = function(e) {
                     const img = document.getElementById('disp_mainPhoto');
                     img.src = e.target.result;
-                    img.style.display = 'block';
+                    document.getElementById('mainPhotoFrame').style.display = 'block';
+                    
+                    // 속성 초기화 및 드래그/줌 활성화
+                    resetImageTransform(img);
+                    makeDraggableAndZoomable(img);
                 }
                 reader.readAsDataURL(file);
             }
         }
 
-        // 하단 관련 이미지 로드 (1~3장 비율 자동 조절)
         function loadBottomImages(event) {
             const files = event.target.files;
             const container = document.getElementById('disp_bottomPhotos');
-            container.innerHTML = ''; // 기존 이미지 초기화
+            container.innerHTML = ''; 
             
-            const maxFiles = Math.min(files.length, 3); // 최대 3장까지만 허용
+            const maxFiles = Math.min(files.length, 3);
+            const rotations = [-4, 2, 5]; // 흩뿌려진 느낌을 위한 회전값
 
             for (let i = 0; i < maxFiles; i++) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
+                    // 프레임 생성
+                    const frame = document.createElement('div');
+                    frame.className = 'photo-frame bottom-photo-frame';
+                    frame.style.transform = `rotate(${rotations[i % 3]}deg)`;
+
+                    // 이미지 생성
                     const img = document.createElement('img');
                     img.src = e.target.result;
                     
-                    // 이미지 개수에 따른 동적 크기 조절
-                    if (maxFiles === 1) {
-                        img.style.width = '200px';
-                        img.style.height = '180px';
-                    } else if (maxFiles === 2) {
-                        img.style.width = '180px';
-                        img.style.height = '160px';
-                        if(i===0) img.style.transform = 'rotate(-3deg)';
-                        if(i===1) img.style.transform = 'rotate(2deg)';
-                    } else if (maxFiles === 3) {
-                        img.style.width = '130px';
-                        img.style.height = '130px';
-                        if(i===0) img.style.transform = 'rotate(-5deg)';
-                        if(i===1) img.style.transform = 'rotate(2deg)';
-                        if(i===2) img.style.transform = 'rotate(4deg)';
-                    }
-                    container.appendChild(img);
+                    resetImageTransform(img);
+                    makeDraggableAndZoomable(img);
+                    
+                    frame.appendChild(img);
+                    container.appendChild(frame);
                 }
                 reader.readAsDataURL(files[i]);
             }
         }
 
-        // 고화질 이미지 저장 (html2canvas 활용)
+        // --- 마우스 드래그(위치) 및 휠(크기) 조절 기능 ---
+        function resetImageTransform(img) {
+            img.dataset.scale = 1;
+            img.dataset.x = 0;
+            img.dataset.y = 0;
+            applyTransform(img);
+        }
+
+        function applyTransform(img) {
+            const x = img.dataset.x || 0;
+            const y = img.dataset.y || 0;
+            const s = img.dataset.scale || 1;
+            img.style.transform = `translate(${x}px, ${y}px) scale(${s})`;
+        }
+
+        function makeDraggableAndZoomable(img) {
+            let isDragging = false;
+            let startX, startY;
+            let initialX = 0, initialY = 0;
+
+            // 드래그 시작
+            img.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                initialX = parseFloat(img.dataset.x) || 0;
+                initialY = parseFloat(img.dataset.y) || 0;
+                e.preventDefault(); // 기본 드래그 방지
+            });
+
+            // 드래그 중
+            window.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    const dx = e.clientX - startX;
+                    const dy = e.clientY - startY;
+                    img.dataset.x = initialX + dx;
+                    img.dataset.y = initialY + dy;
+                    applyTransform(img);
+                }
+            });
+
+            // 드래그 종료
+            window.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+
+            // 휠(크기 조절)
+            img.addEventListener('wheel', (e) => {
+                e.preventDefault(); // 페이지 스크롤 방지
+                let s = parseFloat(img.dataset.scale) || 1;
+                // 휠 방향에 따라 확대/축소 (속도 조절)
+                s += e.deltaY * -0.002;
+                s = Math.max(0.2, Math.min(s, 10)); // 최소 0.2배 ~ 최대 10배
+                img.dataset.scale = s;
+                applyTransform(img);
+            });
+        }
+
+        // --- 이미지 저장 기능 ---
         function saveImage() {
             const captureArea = document.getElementById('capture-area');
             
+            // 캡처 전, css resize 핸들러가 보이지 않도록 일시 처리할 수도 있으나
+            // html2canvas는 기본적으로 네이티브 UI를 무시하므로 바로 캡처 진행
             html2canvas(captureArea, {
-                scale: 3, // 3배율로 캡처하여 고화질 보장
+                scale: 3, // 고화질 3배율
                 useCORS: true,
                 backgroundColor: null 
             }).then(canvas => {
