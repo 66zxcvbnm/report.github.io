@@ -13,7 +13,7 @@
             --text-color: #1a1a1a;
             --font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
             --bg-color: #1a1a1a;
-            --stamp-color: #d32f2f; /* 빨간색 도장 */
+            --stamp-color: #d32f2f;
         }
 
         body {
@@ -60,7 +60,6 @@
 
         .tip-box { background: #2a3b4c; padding: 15px; border-radius: 6px; margin-bottom: 20px; font-size: 0.85rem; line-height: 1.5; border-left: 4px solid #4CAF50; }
 
-        /* 사진 조절 패널 (바 형태) */
         .image-adjust-panel {
             background: #415942;
             padding: 15px;
@@ -108,7 +107,6 @@
             position: relative;
         }
 
-        /* 삐뚤어진 파일철 래퍼 */
         .folder-wrapper {
             position: relative;
             transform: rotate(3deg);
@@ -116,7 +114,6 @@
             z-index: 5;
         }
 
-        /* 파일철 본체 */
         .folder {
             width: 500px; height: 940px;
             background-color: var(--folder-color);
@@ -131,22 +128,10 @@
             border-radius: 0 10px 10px 0; box-shadow: inset -5px 0 10px rgba(0,0,0,0.2);
         }
 
-        /* 구겨진/찢어진 배경 종이들 */
         .bg-paper { position: absolute; background: #e0e0e0; box-shadow: 2px 2px 8px rgba(0,0,0,0.3); z-index: 1; }
-        .bg-paper-1 {
-            width: 470px; height: 910px;
-            transform: rotate(-5deg) translate(-10px, 10px);
-            background: linear-gradient(135deg, #f0f0f0, #d0d0d0);
-            border: 1px solid #ccc;
-        }
-        .bg-paper-2 {
-            width: 480px; height: 880px;
-            transform: rotate(1deg) translate(5px, -15px);
-            background-color: #dbdbdb;
-            clip-path: polygon(0% 0%, 100% 0%, 98% 20%, 100% 40%, 97% 60%, 100% 80%, 96% 100%, 0% 100%);
-        }
+        .bg-paper-1 { width: 470px; height: 910px; transform: rotate(-5deg) translate(-10px, 10px); background: linear-gradient(135deg, #f0f0f0, #d0d0d0); border: 1px solid #ccc; }
+        .bg-paper-2 { width: 480px; height: 880px; transform: rotate(1deg) translate(5px, -15px); background-color: #dbdbdb; clip-path: polygon(0% 0%, 100% 0%, 98% 20%, 100% 40%, 97% 60%, 100% 80%, 96% 100%, 0% 100%); }
 
-        /* 보고서 종이 본체 (바르게 정렬) */
         .paper {
             width: 460px; height: 900px;
             background-color: var(--paper-color);
@@ -158,14 +143,8 @@
             transform: rotate(-3deg);
         }
 
-        /* 클립 */
-        .paper::before {
-            content: '📎'; position: absolute;
-            top: -15px; right: 30px; font-size: 38px;
-            transform: rotate(15deg); z-index: 10;
-        }
+        .paper::before { content: '📎'; position: absolute; top: -15px; right: 30px; font-size: 38px; transform: rotate(15deg); z-index: 10; }
 
-        /* 텍스트 레이아웃 */
         .corner-text { font-size: 0.75rem; font-weight: bold; position: absolute; top: 15px; left: 20px; letter-spacing: 1px; border-bottom: 1.5px solid var(--text-color); }
         .title { text-align: center; font-size: 2.2rem; font-weight: 900; margin-top: 15px; margin-bottom: 25px; border-bottom: 3px solid var(--text-color); padding-bottom: 10px; letter-spacing: 2px; }
         
@@ -176,15 +155,12 @@
         .info-label { width: 75px; font-weight: bold; }
         .info-value { flex: 1; word-break: keep-all; }
 
-        /* 사진 프레임 */
         .photo-frame { overflow: hidden; position: relative; background: #ccc; resize: both; border: 2px solid var(--text-color); box-shadow: 2px 2px 8px rgba(0,0,0,0.2); }
         .photo-frame img { width: 100%; height: 100%; object-fit: cover; transform-origin: center; cursor: pointer; display: block; transition: outline 0.1s; }
-        
         .active-img { outline: 4px solid #4CAF50; outline-offset: -4px; z-index: 10; }
-
         .main-photo-frame { width: 130px; height: 170px; transform: rotate(2deg); display: none; }
         
-        .details-section { margin-top: 20px; min-height: 200px; padding-bottom: 100px; /* 도장을 위한 여백 */ position: relative; }
+        .details-section { margin-top: 20px; min-height: 200px; padding-bottom: 100px; position: relative; }
         .details-section h3 { font-size: 1.15rem; border-bottom: 2px solid var(--text-color); padding-bottom: 5px; margin-bottom: 12px; }
         .details-content { font-size: 0.95rem; line-height: 1.7; white-space: pre-wrap; word-break: break-word; }
 
@@ -193,19 +169,20 @@
 
         /* --- 도장 CSS --- */
         #disp_stamp_area {
-            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-            display: none; /* 기본 숨김 */
+            position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+            display: none; 
             text-align: center;
         }
         #disp_stamp_img {
-            max-width: 150px; /* 도장 크기 */
+            max-width: 140px; 
             height: auto;
             display: block;
             margin: 0 auto 5px;
-            mix-blend-mode: multiply; /* 도장 이미지가 종이 질감과 섞이도록 */
-            opacity: 0.7; /* 도장 반투명 */
+            /* 흰 배경을 투명하게 만들어 종이와 섞이게 하는 핵심 속성 */
+            mix-blend-mode: multiply; 
+            opacity: 0.85; 
         }
-        #disp_stamp_text { font-size: 0.7rem; font-weight: bold; color: var(--stamp-color); margin-top: -10px; }
+        #disp_stamp_text { font-size: 0.8rem; font-weight: bold; color: var(--stamp-color); margin-top: -5px; letter-spacing: 2px;}
     </style>
 </head>
 <body>
@@ -259,15 +236,16 @@
             </div>
         </div>
         
+        <hr style="border-color:#555; margin:20px 0;">
+
         <div class="control-group">
-            <label>도장 설정</label>
-            <div class="flex-row">
+            <label style="color:#ff9e9e;">🚨 도장 이미지 원본 첨부</label>
+            <input type="file" accept="image/*" onchange="processStampImage(event)">
+            <div class="flex-row" style="margin-top: 8px;">
                 <input type="checkbox" id="stampEnabled" onchange="updateStamp()">
                 <label for="stampEnabled" style="font-weight:normal; display:inline-block; margin-bottom:0;">보고서 승인 도장 찍기</label>
             </div>
         </div>
-
-        <hr style="border-color:#555; margin:20px 0;">
 
         <div class="control-group">
             <label>소속</label>
@@ -354,7 +332,7 @@
                             
                             <div id="disp_stamp_area">
                                 <img src="" id="disp_stamp_img" alt="승인 도장">
-                                <div id="disp_stamp_text">승인</div>
+                                <div id="disp_stamp_text">- APPROVED -</div>
                             </div>
                         </div>
 
@@ -376,14 +354,82 @@
     </div>
 
     <script>
-        // 도장 이미지 소스 (ECLIPSE는 Arbiter, HELIOS는 Panoptes, CUSTOM은 없음)
-        const STAMP_IMAGES = {
-            'ECLIPSE': 'data:image/png;base64,...', // Arbiter 도장 이미지
-            'HELIOS': 'data:image/png;base64,...', // Panoptes 도장 이미지
-            'CUSTOM': '' // 도장 없음
+        // 빈 도장 데이터 준비
+        let STAMP_IMAGES = {
+            'ECLIPSE': '', // 상단 Arbiter
+            'HELIOS': '',  // 하단 Panoptes
+            'CUSTOM': ''
         };
 
-        // --- 텍스트/색상/폰트 업데이트 ---
+        // --- 올려주신 도장 이미지를 반으로 자르는 기능 ---
+        function processStampImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                const w = img.width;
+                const h = img.height / 2; // 세로로 정확히 절반 자르기
+
+                canvas.width = w;
+                canvas.height = h;
+
+                // 1. 위쪽 절반 (ECLIPSE - ARBITER) 추출
+                ctx.clearRect(0, 0, w, h);
+                ctx.drawImage(img, 0, 0, w, h, 0, 0, w, h);
+                STAMP_IMAGES['ECLIPSE'] = canvas.toDataURL('image/png');
+
+                // 2. 아래쪽 절반 (HELIOS - PANOPTES) 추출
+                ctx.clearRect(0, 0, w, h);
+                ctx.drawImage(img, 0, h, w, h, 0, 0, w, h);
+                STAMP_IMAGES['HELIOS'] = canvas.toDataURL('image/png');
+
+                alert("도장 이미지가 성공적으로 분리되어 등록되었습니다!\n이제 '보고서 승인 도장 찍기'를 체크해보세요.");
+                
+                // 만약 체크되어 있다면 즉시 반영
+                if(document.getElementById('stampEnabled').checked) {
+                    updateStamp();
+                }
+            };
+            img.src = URL.createObjectURL(file);
+        }
+
+        // --- 도장 업데이트 ---
+        function updateStamp() {
+            const isEnabled = document.getElementById('stampEnabled').checked;
+            const select = document.getElementById('affiliationSelect').value;
+            const stampArea = document.getElementById('disp_stamp_area');
+            const stampImg = document.getElementById('disp_stamp_img');
+            
+            if(isEnabled) {
+                if(!STAMP_IMAGES['ECLIPSE'] && !STAMP_IMAGES['HELIOS']) {
+                    alert("먼저 [🚨 도장 이미지 원본 첨부] 버튼을 눌러 올려주셨던 도장 이미지를 등록해주세요!");
+                    document.getElementById('stampEnabled').checked = false;
+                    return;
+                }
+
+                if(STAMP_IMAGES[select]) {
+                    stampImg.src = STAMP_IMAGES[select];
+                    stampArea.style.display = 'block';
+                    
+                    if(select === 'ECLIPSE') {
+                        stampImg.style.maxWidth = '150px'; 
+                    } else if(select === 'HELIOS') {
+                        stampImg.style.maxWidth = '180px'; 
+                    }
+                } else {
+                    stampArea.style.display = 'none';
+                }
+            } else {
+                stampArea.style.display = 'none';
+            }
+        }
+
+
+        // --- 텍스트/색상/폰트/배경 등 업데이트 ---
         function updateText(field) {
             if (field === 'affiliation') {
                 const select = document.getElementById('affiliationSelect').value;
@@ -409,7 +455,6 @@
             document.documentElement.style.setProperty('--font-family', document.getElementById('fontSelect').value);
         }
 
-        // --- 배경 설정 업데이트 ---
         function updateBackground() {
             document.documentElement.style.setProperty('--bg-color', document.getElementById('bgColor').value);
         }
@@ -430,28 +475,6 @@
             document.getElementById('bgImageInput').value = ''; 
         }
         
-        // --- 도장 업데이트 ---
-        function updateStamp() {
-            const isEnabled = document.getElementById('stampEnabled').checked;
-            const select = document.getElementById('affiliationSelect').value;
-            const stampArea = document.getElementById('disp_stamp_area');
-            const stampImg = document.getElementById('disp_stamp_img');
-            const stampText = document.getElementById('disp_stamp_text');
-            
-            if(isEnabled && STAMP_IMAGES[select]) {
-                stampImg.src = STAMP_IMAGES[select];
-                stampArea.style.display = 'block';
-                // 소속에 따라 도장 스타일 조정 (원형/타원형)
-                if(select === 'ECLIPSE') { // Arbiter 원형
-                    stampImg.style.maxHeight = '150px'; // 높이 제한
-                } else if(select === 'HELIOS') { // Panoptes 타원형
-                    stampImg.style.maxHeight = '100px'; // 타원형이라 높이를 좀 더 낮게
-                }
-            } else {
-                stampArea.style.display = 'none';
-            }
-        }
-
         // --- 이미지 로드 및 조절 기능 ---
         let activeImage = null;
 
@@ -470,7 +493,6 @@
             }
         }
 
-        // 관련 이미지 개별 삽입 함수
         function loadBottomImage(event, index) {
             const file = event.target.files[0];
             if (file) {
@@ -478,12 +500,10 @@
                 reader.onload = function(e) {
                     const frame = document.getElementById('bottomFrame' + index);
                     const img = document.getElementById('bottomImg' + index);
-                    
                     img.src = e.target.result;
-                    frame.style.display = 'block'; // 액자 표시
-                    
+                    frame.style.display = 'block'; 
                     resetImageTransform(img);
-                    setActiveImage(img); // 방금 추가한 이미지 활성화
+                    setActiveImage(img); 
                 }
                 reader.readAsDataURL(file);
             }
@@ -503,7 +523,6 @@
             img.style.transform = `translate(${x}px, ${y}px) scale(${s})`;
         }
 
-        // 선택된 이미지 설정 및 슬라이더 바인딩
         function setActiveImage(img) {
             if (activeImage) activeImage.classList.remove('active-img');
             activeImage = img;
@@ -515,7 +534,6 @@
             document.getElementById('imgY').value = img.dataset.y || 0;
         }
 
-        // 슬라이더 변경 시 호출
         function updateActiveImage() {
             if (!activeImage) return;
             activeImage.dataset.scale = document.getElementById('imgScale').value;
@@ -524,28 +542,23 @@
             applyTransform(activeImage);
         }
 
-        // --- 이미지 저장 (캡처 전 outline 제거) ---
+        // --- 이미지 저장 ---
         function saveImage() {
-            if (activeImage) activeImage.classList.remove('active-img'); // 캡처 시 녹색 테두리 제거
+            if (activeImage) activeImage.classList.remove('active-img'); 
             
             const captureArea = document.getElementById('capture-area');
             html2canvas(captureArea, {
                 scale: 2.5,
                 useCORS: true,
-                backgroundColor: null // 투명/자체 배경 지원
+                backgroundColor: null 
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = '임무보고서.png';
                 link.href = canvas.toDataURL('image/png');
                 link.click();
-
-                // 캡처 후 다시 활성화 상태 복원
                 if (activeImage) activeImage.classList.add('active-img');
             });
         }
-        
-        // 초기 로드 시 도장 업데이트
-        window.onload = updateStamp;
     </script>
 </body>
 </html>
