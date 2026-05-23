@@ -1,1 +1,439 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>임무 보고서 메이커</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --folder-color: #a32a2a;
+            --paper-color: #f4f4f4;
+            --text-color: #1a1a1a;
+        }
 
+        body {
+            font-family: 'Pretendard', -apple-system, sans-serif;
+            background-color: #2c2c2c;
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+        }
+
+        /* 컨트롤 패널 (좌측) */
+        .controls {
+            width: 350px;
+            background: #3d3d3d;
+            padding: 20px;
+            border-radius: 10px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .controls h2 { margin-top: 0; font-size: 1.2rem; }
+        .control-group { margin-bottom: 15px; }
+        .control-group label { display: block; margin-bottom: 5px; font-size: 0.9rem; }
+        .control-group input[type="text"], 
+        .control-group input[type="date"],
+        .control-group select,
+        .control-group textarea {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border-radius: 4px;
+            border: 1px solid #666;
+            background: #2c2c2c;
+            color: #fff;
+        }
+        .control-group textarea { resize: vertical; height: 80px; }
+        
+        .color-pickers { display: flex; gap: 10px; margin-bottom: 15px; }
+        .color-pickers div { flex: 1; }
+        .color-pickers input[type="color"] { width: 100%; height: 30px; border: none; cursor: pointer; }
+
+        button.save-btn {
+            width: 100%;
+            padding: 12px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        button.save-btn:hover { background: #45a049; }
+
+        /* 미리보기 캔버스 영역 (우측, 560x1000 고정) */
+        .preview-container {
+            width: 560px;
+            height: 1000px;
+            flex-shrink: 0;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            background: #111;
+            position: relative;
+        }
+
+        /* 실제 캡처될 영역 */
+        #capture-area {
+            width: 100%;
+            height: 100%;
+            background-color: #111; /* 배경 바깥부분 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 파일철 디자인 */
+        .folder {
+            width: 520px;
+            height: 960px;
+            background-color: var(--folder-color);
+            border-radius: 5px 25px 5px 5px;
+            position: relative;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        /* 파일철 인덱스 탭 느낌 */
+        .folder::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            right: -10px;
+            width: 20px;
+            height: 150px;
+            background-color: inherit;
+            border-radius: 0 10px 10px 0;
+            box-shadow: inset -5px 0 10px rgba(0,0,0,0.1);
+        }
+
+        /* 보고서 종이 디자인 */
+        .paper {
+            width: 480px;
+            height: 920px;
+            background-color: var(--paper-color);
+            color: var(--text-color);
+            box-shadow: 2px 2px 15px rgba(0,0,0,0.4);
+            padding: 30px;
+            box-sizing: border-box;
+            position: relative;
+            background-image: repeating-linear-gradient(transparent, transparent 29px, rgba(0,0,0,0.05) 30px);
+            background-attachment: local;
+        }
+
+        .paper::before {
+            content: '📎';
+            position: absolute;
+            top: -15px;
+            left: 30px;
+            font-size: 40px;
+            transform: rotate(-15deg);
+        }
+
+        /* 종이 내부 레이아웃 */
+        .corner-text {
+            font-size: 0.7rem;
+            font-weight: bold;
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            letter-spacing: 1px;
+            border-bottom: 1px solid var(--text-color);
+        }
+
+        .title {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 900;
+            margin-top: 20px;
+            margin-bottom: 25px;
+            border-bottom: 3px double var(--text-color);
+            padding-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .top-section {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .info-table {
+            width: 60%;
+            font-size: 0.9rem;
+            line-height: 1.8;
+            border-top: 2px solid var(--text-color);
+            border-bottom: 2px solid var(--text-color);
+            padding: 10px 0;
+        }
+        
+        .info-row { display: flex; border-bottom: 1px dashed rgba(0,0,0,0.2); }
+        .info-row:last-child { border-bottom: none; }
+        .info-label { width: 80px; font-weight: bold; }
+        .info-value { flex: 1; word-break: keep-all; }
+
+        .main-photo {
+            width: 120px;
+            height: 160px;
+            border: 2px solid var(--text-color);
+            background: #ccc;
+            object-fit: cover;
+            transform: rotate(3deg);
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .details-section {
+            margin-top: 20px;
+            min-height: 250px;
+        }
+        .details-section h3 {
+            font-size: 1.1rem;
+            border-bottom: 2px solid var(--text-color);
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+        .details-content {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .bottom-photos {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+        
+        .bottom-photos img {
+            object-fit: cover;
+            border: 5px solid #fff;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="controls">
+        <h2>보고서 설정</h2>
+        
+        <div class="color-pickers">
+            <div>
+                <label>파일철 색상</label>
+                <input type="color" id="folderColor" value="#a32a2a" oninput="updateColors()">
+            </div>
+            <div>
+                <label>보고서 색상</label>
+                <input type="color" id="paperColor" value="#f4f4f4" oninput="updateColors()">
+            </div>
+            <div>
+                <label>글씨 색상</label>
+                <input type="color" id="textColor" value="#1a1a1a" oninput="updateColors()">
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label>소속 (상단 구석)</label>
+            <select id="affiliationSelect" onchange="toggleCustomAffiliation()">
+                <option value="HELIOS">HELIOS</option>
+                <option value="ECLIPSE">ECLIPSE</option>
+                <option value="CUSTOM">직접 입력</option>
+            </select>
+            <input type="text" id="customAffiliation" placeholder="직접 입력" style="display:none; margin-top:5px;" oninput="updateText('affiliation')">
+        </div>
+
+        <div class="control-group">
+            <label>임무번호</label>
+            <input type="text" id="missionNoInput" value="CASE-001" oninput="updateText('missionNo')">
+        </div>
+
+        <div class="control-group">
+            <label>날짜</label>
+            <input type="text" id="dateInput" value="2026. 05. 23" oninput="updateText('date')">
+        </div>
+
+        <div class="control-group">
+            <label>위치</label>
+            <input type="text" id="locationInput" value="Sector 7" oninput="updateText('location')">
+        </div>
+
+        <div class="control-group">
+            <label>동행인</label>
+            <input type="text" id="companionInput" value="Agent K" oninput="updateText('companion')">
+        </div>
+
+        <div class="control-group">
+            <label>메인 사진 (상단 우측)</label>
+            <input type="file" accept="image/*" onchange="loadMainImage(event)">
+        </div>
+
+        <div class="control-group">
+            <label>임무 내용</label>
+            <textarea id="detailsInput" oninput="updateText('details')">특이사항 없음. 임무 완수.</textarea>
+        </div>
+
+        <div class="control-group">
+            <label>관련 이미지 (하단, 1~3장)</label>
+            <input type="file" accept="image/*" multiple onchange="loadBottomImages(event)">
+            <small style="color:#aaa; display:block; margin-top:5px;">* 선택할 때마다 기존 사진이 덮어씌워집니다.</small>
+        </div>
+
+        <button class="save-btn" onclick="saveImage()">고화질 저장하기 (560x1000)</button>
+    </div>
+
+    <div class="preview-container">
+        <div id="capture-area">
+            <div class="folder">
+                <div class="paper">
+                    <div class="corner-text" id="disp_affiliation">HELIOS</div>
+                    
+                    <div class="title">임무 보고서</div>
+
+                    <div class="top-section">
+                        <div class="info-table">
+                            <div class="info-row">
+                                <div class="info-label">임무번호</div>
+                                <div class="info-value" id="disp_missionNo">CASE-001</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">날짜</div>
+                                <div class="info-value" id="disp_date">2026. 05. 23</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">위치</div>
+                                <div class="info-value" id="disp_location">Sector 7</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">동행인</div>
+                                <div class="info-value" id="disp_companion">Agent K</div>
+                            </div>
+                        </div>
+                        
+                        <img src="" id="disp_mainPhoto" class="main-photo" style="display:none;">
+                    </div>
+
+                    <div class="details-section">
+                        <h3>임무 내용</h3>
+                        <div class="details-content" id="disp_details">특이사항 없음. 임무 완수.</div>
+                    </div>
+
+                    <div class="bottom-photos" id="disp_bottomPhotos">
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 텍스트 업데이트
+        function updateText(field) {
+            if (field === 'affiliation') {
+                const select = document.getElementById('affiliationSelect').value;
+                const custom = document.getElementById('customAffiliation').value;
+                document.getElementById('disp_affiliation').innerText = select === 'CUSTOM' ? custom : select;
+            } else {
+                const val = document.getElementById(field + 'Input').value;
+                document.getElementById('disp_' + field).innerText = val;
+            }
+        }
+
+        // 상단 구석 소속 선택 토글
+        function toggleCustomAffiliation() {
+            const select = document.getElementById('affiliationSelect').value;
+            const customInput = document.getElementById('customAffiliation');
+            if (select === 'CUSTOM') {
+                customInput.style.display = 'block';
+            } else {
+                customInput.style.display = 'none';
+            }
+            updateText('affiliation');
+        }
+
+        // 색상 업데이트 (CSS 변수 활용)
+        function updateColors() {
+            document.documentElement.style.setProperty('--folder-color', document.getElementById('folderColor').value);
+            document.documentElement.style.setProperty('--paper-color', document.getElementById('paperColor').value);
+            document.documentElement.style.setProperty('--text-color', document.getElementById('textColor').value);
+        }
+
+        // 상단 메인 이미지 로드
+        function loadMainImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.getElementById('disp_mainPhoto');
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // 하단 관련 이미지 로드 (1~3장 비율 자동 조절)
+        function loadBottomImages(event) {
+            const files = event.target.files;
+            const container = document.getElementById('disp_bottomPhotos');
+            container.innerHTML = ''; // 기존 이미지 초기화
+            
+            const maxFiles = Math.min(files.length, 3); // 최대 3장까지만 허용
+
+            for (let i = 0; i < maxFiles; i++) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    
+                    // 이미지 개수에 따른 동적 크기 조절
+                    if (maxFiles === 1) {
+                        img.style.width = '200px';
+                        img.style.height = '180px';
+                    } else if (maxFiles === 2) {
+                        img.style.width = '180px';
+                        img.style.height = '160px';
+                        if(i===0) img.style.transform = 'rotate(-3deg)';
+                        if(i===1) img.style.transform = 'rotate(2deg)';
+                    } else if (maxFiles === 3) {
+                        img.style.width = '130px';
+                        img.style.height = '130px';
+                        if(i===0) img.style.transform = 'rotate(-5deg)';
+                        if(i===1) img.style.transform = 'rotate(2deg)';
+                        if(i===2) img.style.transform = 'rotate(4deg)';
+                    }
+                    container.appendChild(img);
+                }
+                reader.readAsDataURL(files[i]);
+            }
+        }
+
+        // 고화질 이미지 저장 (html2canvas 활용)
+        function saveImage() {
+            const captureArea = document.getElementById('capture-area');
+            
+            html2canvas(captureArea, {
+                scale: 3, // 3배율로 캡처하여 고화질 보장
+                useCORS: true,
+                backgroundColor: null 
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = '임무보고서.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+    </script>
+</body>
+</html>
