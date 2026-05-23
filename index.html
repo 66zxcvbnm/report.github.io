@@ -13,6 +13,7 @@
             --text-color: #1a1a1a;
             --font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
             --bg-color: #1a1a1a;
+            --stamp-color: #d32f2f; /* 빨간색 도장 */
         }
 
         body {
@@ -52,6 +53,7 @@
         .control-group textarea { resize: vertical; height: 70px; }
         .control-group input[type="color"] { width: 40px; height: 35px; border: none; cursor: pointer; border-radius: 4px; padding: 0; background: none; }
         .control-group input[type="file"] { margin-bottom: 8px; }
+        .control-group input[type="checkbox"] { margin-right: 8px; vertical-align: middle; }
         
         .flex-row { display: flex; gap: 10px; align-items: center; }
         .flex-row > div { flex: 1; }
@@ -182,12 +184,28 @@
 
         .main-photo-frame { width: 130px; height: 170px; transform: rotate(2deg); display: none; }
         
-        .details-section { margin-top: 20px; min-height: 200px; }
+        .details-section { margin-top: 20px; min-height: 200px; padding-bottom: 100px; /* 도장을 위한 여백 */ position: relative; }
         .details-section h3 { font-size: 1.15rem; border-bottom: 2px solid var(--text-color); padding-bottom: 5px; margin-bottom: 12px; }
         .details-content { font-size: 0.95rem; line-height: 1.7; white-space: pre-wrap; word-break: break-word; }
 
         .bottom-photos { margin-top: 20px; display: flex; gap: 15px; justify-content: center; align-items: center; height: 220px; }
         .bottom-photo-frame { width: 130px; height: 130px; border: 4px solid #fff; }
+
+        /* --- 도장 CSS --- */
+        #disp_stamp_area {
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            display: none; /* 기본 숨김 */
+            text-align: center;
+        }
+        #disp_stamp_img {
+            max-width: 150px; /* 도장 크기 */
+            height: auto;
+            display: block;
+            margin: 0 auto 5px;
+            mix-blend-mode: multiply; /* 도장 이미지가 종이 질감과 섞이도록 */
+            opacity: 0.7; /* 도장 반투명 */
+        }
+        #disp_stamp_text { font-size: 0.7rem; font-weight: bold; color: var(--stamp-color); margin-top: -10px; }
     </style>
 </head>
 <body>
@@ -240,13 +258,21 @@
                 <input type="color" id="textColor" value="#1a1a1a" oninput="updateColors()">
             </div>
         </div>
+        
+        <div class="control-group">
+            <label>도장 설정</label>
+            <div class="flex-row">
+                <input type="checkbox" id="stampEnabled" onchange="updateStamp()">
+                <label for="stampEnabled" style="font-weight:normal; display:inline-block; margin-bottom:0;">보고서 승인 도장 찍기</label>
+            </div>
+        </div>
 
         <hr style="border-color:#555; margin:20px 0;">
 
         <div class="control-group">
             <label>소속</label>
-            <select id="affiliationSelect" onchange="toggleCustomAffiliation()">
-                <option value="HELIOS">HELIOS</option>
+            <select id="affiliationSelect" onchange="toggleCustomAffiliation(); updateStamp();">
+                <option value="HELIOS" selected>HELIOS</option>
                 <option value="ECLIPSE">ECLIPSE</option>
                 <option value="CUSTOM">직접 입력</option>
             </select>
@@ -278,7 +304,6 @@
             <input type="file" accept="image/*" onchange="loadBottomImage(event, 3)">
         </div>
 
-        <!-- 이미지 조정 슬라이더 패널 -->
         <div id="imageAdjustControls" class="image-adjust-panel">
             <h3>🎛️ 선택된 이미지 조절</h3>
             <div class="slider-group">
@@ -302,7 +327,6 @@
         <div id="capture-area">
             <div class="folder-wrapper">
                 <div class="folder">
-                    <!-- 구겨진 뒷배경 종이들 -->
                     <div class="bg-paper bg-paper-1"></div>
                     <div class="bg-paper bg-paper-2"></div>
 
@@ -327,10 +351,14 @@
                         <div class="details-section">
                             <h3>임무 내용</h3>
                             <div class="details-content" id="disp_details">특이사항 없음. 임무 완수.</div>
+                            
+                            <div id="disp_stamp_area">
+                                <img src="" id="disp_stamp_img" alt="승인 도장">
+                                <div id="disp_stamp_text">승인</div>
+                            </div>
                         </div>
 
                         <div class="bottom-photos" id="disp_bottomPhotos">
-                            <!-- 관련 이미지 프레임 3개 미리 생성 (이미지 들어오면 보이도록 처리) -->
                             <div class="photo-frame bottom-photo-frame" id="bottomFrame1" style="transform: rotate(-3deg); display: none;">
                                 <img src="" id="bottomImg1" onclick="setActiveImage(this)">
                             </div>
@@ -348,6 +376,13 @@
     </div>
 
     <script>
+        // 도장 이미지 소스 (ECLIPSE는 Arbiter, HELIOS는 Panoptes, CUSTOM은 없음)
+        const STAMP_IMAGES = {
+            'ECLIPSE': 'data:image/png;base64,...', // Arbiter 도장 이미지
+            'HELIOS': 'data:image/png;base64,...', // Panoptes 도장 이미지
+            'CUSTOM': '' // 도장 없음
+        };
+
         // --- 텍스트/색상/폰트 업데이트 ---
         function updateText(field) {
             if (field === 'affiliation') {
@@ -393,6 +428,28 @@
         function clearBackgroundImage() {
             document.getElementById('capture-area').style.backgroundImage = 'none';
             document.getElementById('bgImageInput').value = ''; 
+        }
+        
+        // --- 도장 업데이트 ---
+        function updateStamp() {
+            const isEnabled = document.getElementById('stampEnabled').checked;
+            const select = document.getElementById('affiliationSelect').value;
+            const stampArea = document.getElementById('disp_stamp_area');
+            const stampImg = document.getElementById('disp_stamp_img');
+            const stampText = document.getElementById('disp_stamp_text');
+            
+            if(isEnabled && STAMP_IMAGES[select]) {
+                stampImg.src = STAMP_IMAGES[select];
+                stampArea.style.display = 'block';
+                // 소속에 따라 도장 스타일 조정 (원형/타원형)
+                if(select === 'ECLIPSE') { // Arbiter 원형
+                    stampImg.style.maxHeight = '150px'; // 높이 제한
+                } else if(select === 'HELIOS') { // Panoptes 타원형
+                    stampImg.style.maxHeight = '100px'; // 타원형이라 높이를 좀 더 낮게
+                }
+            } else {
+                stampArea.style.display = 'none';
+            }
         }
 
         // --- 이미지 로드 및 조절 기능 ---
@@ -486,6 +543,9 @@
                 if (activeImage) activeImage.classList.add('active-img');
             });
         }
+        
+        // 초기 로드 시 도장 업데이트
+        window.onload = updateStamp;
     </script>
 </body>
 </html>
