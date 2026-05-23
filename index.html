@@ -12,9 +12,6 @@
             --paper-color: #f4f4f4;
             --text-color: #1a1a1a;
             --font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
-            --pen-color: #f7c331;
-            --cup-color: #ffffff;
-            --snack-color: #ff99cc;
         }
 
         body {
@@ -81,7 +78,7 @@
 
         /* --- 우측 미리보기 영역 --- */
         .preview-container {
-            width: 650px; /* 장식을 위해 약간 넓게 */
+            width: 650px; 
             height: 1050px;
             flex-shrink: 0;
             background: #1a1a1a;
@@ -93,7 +90,7 @@
 
         #capture-area {
             width: 100%; height: 100%;
-            background-color: #1a1a1a; /* 책상 배경색 */
+            background-color: #1a1a1a;
             display: flex; align-items: center; justify-content: center;
             position: relative;
         }
@@ -149,7 +146,7 @@
             transform: rotate(-3deg); /* 파일철 회전을 상쇄하여 화면 기준 똑바르게 */
         }
 
-        /* 클립 (우측 상단으로 이동) */
+        /* 클립 (우측 상단) */
         .paper::before {
             content: '📎'; position: absolute;
             top: -15px; right: 30px; font-size: 38px;
@@ -182,68 +179,6 @@
 
         .bottom-photos { margin-top: 20px; display: flex; gap: 15px; justify-content: center; align-items: center; height: 220px; }
         .bottom-photo-frame { width: 130px; height: 130px; border: 4px solid #fff; }
-
-        /* --- 장식 CSS --- */
-        .deco { position: absolute; z-index: 10; display: none; filter: drop-shadow(4px 4px 5px rgba(0,0,0,0.4)); }
-
-        /* 필기구 (종이 하단) */
-        .pen-wrapper {
-            position: absolute; bottom: 20px; right: 50px;
-            transform: rotate(-25deg); z-index: 20; display: block;
-        }
-        .pen-none { display: none; }
-        /* 연필 */
-        .pen-pencil { width: 12px; height: 150px; background: var(--pen-color); box-shadow: 3px 3px 5px rgba(0,0,0,0.3); position: relative;}
-        .pen-pencil::before { content: ''; position: absolute; top: -15px; left: 0; width: 12px; height: 15px; background: linear-gradient(to bottom, #f29b9b 60%, #a3a3a3 60%, #d1d1d1 100%); border-radius: 3px 3px 0 0; }
-        .pen-pencil::after { content: ''; position: absolute; bottom: -20px; left: 0; border-top: 20px solid #e8cc9e; border-left: 6px solid transparent; border-right: 6px solid transparent; }
-        .pen-pencil-lead { position: absolute; bottom: -20px; left: 4.5px; border-top: 5px solid #333; border-left: 1.5px solid transparent; border-right: 1.5px solid transparent; z-index: 21; }
-        /* 볼펜 */
-        .pen-ballpoint { width: 10px; height: 150px; background: var(--pen-color); border-radius: 5px; box-shadow: 2px 2px 4px rgba(0,0,0,0.3); position: relative; }
-        .pen-ballpoint::before { content: ''; position: absolute; width: 4px; height: 12px; background: #555; top: -12px; left: 3px; border-radius: 2px 2px 0 0; }
-        .pen-ballpoint::after { content: ''; position: absolute; bottom: -12px; left: 1px; border-top: 12px solid #ccc; border-left: 4px solid transparent; border-right: 4px solid transparent; }
-        /* 만년필 */
-        .pen-fountain { width: 14px; height: 140px; background: var(--pen-color); border-radius: 8px 8px 0 0; box-shadow: 3px 3px 6px rgba(0,0,0,0.3); position: relative; }
-        .pen-fountain::before { content: ''; position: absolute; top: 15px; left: 0; width: 14px; height: 5px; background: gold; }
-        .pen-fountain::after { content: ''; position: absolute; bottom: -18px; left: 2px; border-top: 18px solid gold; border-left: 5px solid transparent; border-right: 5px solid transparent; }
-
-        /* 음료 (좌측 상단) */
-        #deco-drink { top: 40px; left: 30px; }
-        .cup {
-            width: 70px; height: 85px; background: var(--cup-color);
-            border-radius: 5px 5px 15px 15px; position: relative;
-        }
-        .cup-handle {
-            position: absolute; right: -25px; top: 20px;
-            width: 30px; height: 40px; border: 8px solid var(--cup-color);
-            border-left: none; border-radius: 0 20px 20px 0; box-sizing: border-box;
-        }
-        .cup-liquid {
-            position: absolute; top: 4px; left: 4px; right: 4px; height: 12px;
-            border-radius: 50%; background: #4a2511; /* 기본 커피 */
-        }
-
-        /* 음식 (좌측 하단) */
-        #deco-food { bottom: 50px; left: 40px; }
-        .food-riceball {
-            width: 0; height: 0; border-left: 45px solid transparent; border-right: 45px solid transparent; border-bottom: 80px solid #fff; position: relative;
-        }
-        .food-riceball::after { content:''; position: absolute; bottom: -80px; left: -18px; width: 36px; height: 28px; background: #222; } /* 김 */
-        
-        .food-sandwich {
-            width: 0; height: 0; border-left: 90px solid transparent; border-bottom: 90px solid #f5deb3; position: relative;
-        }
-        .food-sandwich::before { content:''; position: absolute; top: 25px; left: -70px; width: 90px; height: 12px; background: #8b4513; transform: rotate(45deg); }
-
-        /* 간식 (우측 하단) */
-        #deco-snack { bottom: 60px; right: 50px; }
-        .snack-jelly { width: 60px; height: 50px; background: var(--snack-color); border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
-        .snack-chip { width: 70px; height: 50px; background: var(--snack-color); border-radius: 50%; transform: rotate(20deg); box-shadow: inset 15px -10px 10px rgba(0,0,0,0.1); }
-        .snack-cookie { width: 65px; height: 65px; background: var(--snack-color); border-radius: 50%; box-shadow: inset -5px -5px 10px rgba(0,0,0,0.2); position: relative; }
-        .snack-cookie::after { content: ''; position: absolute; width: 8px; height: 8px; background: #333; border-radius: 50%; top: 15px; left: 20px; box-shadow: 20px 5px 0 #333, 10px 25px 0 #333, -5px 20px 0 #333, 25px 25px 0 #333; }
-        .snack-candy { width: 35px; height: 35px; background: var(--snack-color); border-radius: 50%; position: relative; top: 10px;}
-        .snack-candy::before, .snack-candy::after { content:''; position: absolute; top: 7px; border-top: 10px solid transparent; border-bottom: 10px solid transparent; }
-        .snack-candy::before { right: 100%; border-right: 15px solid var(--snack-color); }
-        .snack-candy::after { left: 100%; border-left: 15px solid var(--snack-color); }
     </style>
 </head>
 <body>
@@ -279,67 +214,6 @@
             <div>
                 <label>글씨 색상</label>
                 <input type="color" id="textColor" value="#1a1a1a" oninput="updateColors()">
-            </div>
-        </div>
-
-        <div class="control-group flex-row">
-            <div>
-                <label>필기구</label>
-                <select id="penType" onchange="updateDecorations()">
-                    <option value="pen-pencil">연필</option>
-                    <option value="pen-ballpoint">볼펜</option>
-                    <option value="pen-fountain">만년필</option>
-                    <option value="pen-none">없음</option>
-                </select>
-            </div>
-            <div>
-                <label>색상</label>
-                <input type="color" id="penColor" value="#f7c331" oninput="updateDecorations()">
-            </div>
-        </div>
-
-        <div class="control-group flex-row">
-            <div>
-                <label>상단 장식 (음료)</label>
-                <select id="drinkType" onchange="updateDecorations()">
-                    <option value="none">없음</option>
-                    <option value="water">물</option>
-                    <option value="coffee" selected>커피</option>
-                    <option value="greentea">녹차</option>
-                    <option value="juice">주스</option>
-                </select>
-            </div>
-            <div>
-                <label>컵 색상</label>
-                <input type="color" id="cupColor" value="#ffffff" oninput="updateDecorations()">
-            </div>
-        </div>
-
-        <div class="control-group flex-row">
-            <div>
-                <label>하단 장식 1 (음식)</label>
-                <select id="foodType" onchange="updateDecorations()">
-                    <option value="none">없음</option>
-                    <option value="food-sandwich" selected>샌드위치</option>
-                    <option value="food-riceball">주먹밥</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="control-group flex-row">
-            <div>
-                <label>하단 장식 2 (간식)</label>
-                <select id="snackType" onchange="updateDecorations()">
-                    <option value="none">없음</option>
-                    <option value="jelly">젤리</option>
-                    <option value="chip">감자칩</option>
-                    <option value="cookie" selected>쿠키</option>
-                    <option value="candy">사탕</option>
-                </select>
-            </div>
-            <div>
-                <label>색상</label>
-                <input type="color" id="snackColor" value="#ff99cc" oninput="updateDecorations()">
             </div>
         </div>
 
@@ -400,30 +274,7 @@
 
     <div class="preview-container">
         <div id="capture-area">
-            
-            <!-- 상단 음료 장식 -->
-            <div id="deco-drink" class="deco" style="display:block;">
-                <div class="cup">
-                    <div class="cup-liquid" id="drink-liquid"></div>
-                    <div class="cup-handle"></div>
-                </div>
-            </div>
-
-            <!-- 하단 음식 장식 -->
-            <div id="deco-food" class="deco food-sandwich" style="display:block;"></div>
-            
-            <!-- 하단 간식 장식 -->
-            <div id="deco-snack" class="deco snack-cookie" style="display:block;"></div>
-
             <div class="folder-wrapper">
-                
-                <!-- 하단 필기구 장식 -->
-                <div class="pen-wrapper">
-                    <div id="disp_pen" class="pen-pencil">
-                        <div class="pen-pencil-lead" id="disp_pen_lead"></div>
-                    </div>
-                </div>
-
                 <div class="folder">
                     <!-- 구겨진 뒷배경 종이들 -->
                     <div class="bg-paper bg-paper-1"></div>
@@ -484,40 +335,6 @@
 
         function updateFont() {
             document.documentElement.style.setProperty('--font-family', document.getElementById('fontSelect').value);
-        }
-
-        // --- 장식(음료, 필기구, 간식) 업데이트 ---
-        function updateDecorations() {
-            // 필기구
-            const penType = document.getElementById('penType').value;
-            document.documentElement.style.setProperty('--pen-color', document.getElementById('penColor').value);
-            const penEl = document.getElementById('disp_pen');
-            penEl.className = penType;
-            document.getElementById('disp_pen_lead').style.display = (penType === 'pen-pencil') ? 'block' : 'none';
-
-            // 음료
-            const drink = document.getElementById('drinkType').value;
-            document.documentElement.style.setProperty('--cup-color', document.getElementById('cupColor').value);
-            const drinkEl = document.getElementById('deco-drink');
-            if(drink === 'none') { drinkEl.style.display = 'none'; }
-            else {
-                drinkEl.style.display = 'block';
-                const colors = { water: '#add8e6', coffee: '#4a2511', greentea: '#c8e6c9', juice: '#ffc107' };
-                document.getElementById('drink-liquid').style.background = colors[drink];
-            }
-
-            // 음식
-            const food = document.getElementById('foodType').value;
-            const foodEl = document.getElementById('deco-food');
-            if(food === 'none') { foodEl.style.display = 'none'; }
-            else { foodEl.className = 'deco ' + food; foodEl.style.display = 'block'; }
-
-            // 간식
-            const snack = document.getElementById('snackType').value;
-            document.documentElement.style.setProperty('--snack-color', document.getElementById('snackColor').value);
-            const snackEl = document.getElementById('deco-snack');
-            if(snack === 'none') { snackEl.style.display = 'none'; }
-            else { snackEl.className = 'deco snack-' + snack; snackEl.style.display = 'block'; }
         }
 
         // --- 이미지 로드 및 조절 기능 ---
